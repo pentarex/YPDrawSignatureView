@@ -12,6 +12,8 @@ import UIKit
 @IBDesignable
 public class YPDrawSignatureView: UIView {
     
+    var delegate:YPDrawSignatureViewDelegate? // ADDED
+    
     // MARK: - Public properties
     @IBInspectable public var strokeWidth: CGFloat = 2.0 {
         didSet {
@@ -74,6 +76,12 @@ public class YPDrawSignatureView: UIView {
             let touchPoint = firstTouch.locationInView(self)
             self.ctr = 0
             self.pts[0] = touchPoint
+            
+            // ADDED
+            if (self.delegate != nil) {
+               self.delegate?.startedDrawing!()
+            }
+            
         }
     }
     
@@ -103,8 +111,16 @@ public class YPDrawSignatureView: UIView {
             self.path.moveToPoint(CGPointMake(touchPoint.x-1.0,touchPoint.y))
             self.path.addLineToPoint(CGPointMake(touchPoint.x+1.0,touchPoint.y))
             self.setNeedsDisplay()
+            // ADDED
+            if (self.delegate != nil) {
+                self.delegate?.finishedDrawing!()
+            }
         } else {
             self.ctr = 0
+            // ADDED
+            if (self.delegate != nil) {
+                self.delegate?.finishedDrawing!()
+            }
         }
     }
     
@@ -128,7 +144,7 @@ public class YPDrawSignatureView: UIView {
             return nil
         }
     }
-  
+    
     // Save the Signature (cropped of outside white space) as a UIImage
     public func getSignatureCropped() -> UIImage? {
         if let fullRender = getSignature() {
